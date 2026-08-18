@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { supabase } from "./supabase";
+import logo from "./assets/logo.png";
+import ltWaveFont from "./assets/LTWaveAlt-Black.otf";
 
 const ADMIN_ID = "e9ab0b06-303d-43b4-abb6-53a58506006e";
 
@@ -12,13 +14,12 @@ function App() {
   useEffect(() => {
     kontrolEt();
 
-    const {
-      data: listener,
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setOturum(session);
-      }
-    );
+    const { data: listener } =
+      supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          setOturum(session);
+        }
+      );
 
     return () => {
       listener.subscription.unsubscribe();
@@ -40,93 +41,212 @@ function App() {
     );
   }
 
-  const adminMi =
-    oturum?.user?.id === ADMIN_ID;
+  const adminMi = oturum?.user?.id === ADMIN_ID;
 
   return (
-    <div style={styles.sayfa}>
+    <>
+      <style>
+        {`
+          @font-face {
+            font-family: "LT Wave Alt Black";
+            src: url("${ltWaveFont}") format("opentype");
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+          }
 
-      <header style={styles.header}>
-        <div style={styles.headerIc}>
+          * {
+            box-sizing: border-box;
+          }
 
-          <div
-            style={styles.logo}
-            onClick={() => setSayfa("arama")}
-          >
-            RAFBUL
-          </div>
+          html,
+          body,
+          #root {
+            width: 100%;
+            min-width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #070910;
+          }
 
-          <div style={styles.menu}>
+          body {
+            overflow-x: hidden;
+          }
 
-            <button
-              style={styles.menuButon}
-              onClick={() => setSayfa("arama")}
+          button,
+          input {
+            font-family: inherit;
+          }
+
+          input::placeholder {
+            color: rgba(220, 225, 240, 0.52);
+            opacity: 1;
+          }
+
+          input:focus {
+            border-color: rgba(110, 170, 255, 0.75) !important;
+            box-shadow:
+              0 0 0 3px rgba(70, 130, 255, 0.10),
+              0 0 30px rgba(70, 130, 255, 0.10) !important;
+          }
+
+          ::selection {
+            background: rgba(90, 130, 255, 0.45);
+            color: white;
+          }
+
+          button {
+            -webkit-tap-highlight-color: transparent;
+          }
+
+          .arama-kapsayici input::placeholder {
+            color: #7f899d !important;
+            opacity: 1;
+          }
+
+          .arama-kapsayici input:focus {
+            border-color: rgba(180,195,255,.32) !important;
+            background:
+              linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.05)) !important;
+            box-shadow:
+              0 20px 60px rgba(0,0,0,.32),
+              0 0 0 4px rgba(150,170,255,.055),
+              inset 0 1px rgba(255,255,255,.11) !important;
+          }
+
+          .arama-kapsayici .sonuc:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,.18);
+            box-shadow:
+              0 22px 58px rgba(0,0,0,.32),
+              inset 0 1px rgba(255,255,255,.09);
+          }
+
+          @keyframes etiketDolabiGiris {
+            from {
+              opacity: 0;
+              transform: translateY(7px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .arama-kapsayici .sonuc {
+            animation: etiketDolabiGiris .24s ease-out both;
+          }
+
+          @media (max-width: 600px) {
+            .ust-menu {
+              gap: 4px !important;
+            }
+
+            .ust-menu button {
+              padding: 8px 9px !important;
+              font-size: 12px !important;
+            }
+
+            .ana-logo {
+              width: 170px !important;
+              height: 170px !important;
+            }
+
+            .ana-baslik {
+              font-size: 38px !important;
+              letter-spacing: 1px !important;
+            }
+
+            .arama-kapsayici {
+              width: calc(100% - 30px) !important;
+            }
+          }
+        `}
+      </style>
+
+      <div style={styles.sayfa}>
+
+        <header style={styles.header}>
+
+          <div style={styles.headerIc}>
+
+            <div style={styles.headerBosluk}></div>
+
+            <div
+              className="ust-menu"
+              style={styles.menu}
             >
-              Ürün Ara
-            </button>
 
-            {!oturum && (
               <button
                 style={styles.menuButon}
-                onClick={() => setSayfa("giris")}
+                onClick={() => setSayfa("arama")}
               >
-                Admin Girişi
+                Ürün Ara
               </button>
-            )}
 
-            {adminMi && (
-              <>
+              {!oturum && (
                 <button
                   style={styles.menuButon}
-                  onClick={() => setSayfa("admin")}
+                  onClick={() => setSayfa("giris")}
                 >
-                  Admin Paneli
+                  Admin Girişi
                 </button>
+              )}
 
-                <button
-                  style={styles.cikisButon}
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    setSayfa("arama");
-                  }}
-                >
-                  Çıkış
-                </button>
-              </>
-            )}
+              {adminMi && (
+                <>
+                  <button
+                    style={styles.menuButon}
+                    onClick={() => setSayfa("admin")}
+                  >
+                    Admin Paneli
+                  </button>
+
+                  <button
+                    style={styles.cikisButon}
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setSayfa("arama");
+                    }}
+                  >
+                    Çıkış
+                  </button>
+                </>
+              )}
+
+            </div>
 
           </div>
-        </div>
-      </header>
 
-      {sayfa === "arama" && (
-        <AramaSayfasi />
-      )}
+        </header>
 
-      {sayfa === "giris" && (
-        <GirisSayfasi
-          setSayfa={setSayfa}
-        />
-      )}
+        {sayfa === "arama" && (
+          <AramaSayfasi />
+        )}
 
-      {sayfa === "admin" && adminMi && (
-        <AdminPanel />
-      )}
+        {sayfa === "giris" && (
+          <GirisSayfasi setSayfa={setSayfa} />
+        )}
 
-    </div>
+        {sayfa === "admin" && adminMi && (
+          <AdminPanel />
+        )}
+
+      </div>
+    </>
   );
 }
 
 
-/* =====================================
-   ÜRÜN ARAMA
-===================================== */
+/* =====================================================
+   ARAMA SAYFASI
+===================================================== */
 
 function AramaSayfasi() {
 
   const [urunler, setUrunler] = useState([]);
   const [arama, setArama] = useState("");
-  const [sonuclar, setSonuclar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
 
@@ -137,7 +257,7 @@ function AramaSayfasi() {
   useEffect(() => {
 
     const kanal = supabase
-      .channel("urunler-canli")
+      .channel("urunler-canli-arama")
       .on(
         "postgres_changes",
         {
@@ -159,108 +279,125 @@ function AramaSayfasi() {
 
   async function verileriGetir() {
 
-    const { data, error } = await supabase
-      .from("urunler")
-      .select(
-        "id, urun_kodu, urun_ismi, raf"
-      )
-      .order("urun_kodu");
+    const { data, error } =
+      await supabase
+        .from("urunler")
+        .select(
+          "id, urun_kodu, urun_ismi, raf"
+        )
+        .order("urun_kodu");
 
     if (error) {
-
       console.error(error);
 
       setHata(
         "Ürünler alınırken bir hata oluştu."
       );
-
     } else {
-
       setUrunler(data || []);
-
     }
 
     setYukleniyor(false);
   }
 
-  function ara() {
-
-    const kelime = arama
+  const kelime =
+    arama
       .trim()
       .toLocaleLowerCase("tr-TR");
 
-    if (!kelime) {
-      setSonuclar([]);
-      return;
-    }
+  const sonuclar =
+    kelime
+      ? urunler.filter((urun) => {
 
-    const bulunanlar =
-      urunler.filter((urun) => {
+          const kod =
+            (urun.urun_kodu || "")
+              .toLocaleLowerCase("tr-TR");
 
-        const kod =
-          (urun.urun_kodu || "")
-            .toLocaleLowerCase("tr-TR");
+          const isim =
+            (urun.urun_ismi || "")
+              .toLocaleLowerCase("tr-TR");
 
-        const isim =
-          (urun.urun_ismi || "")
-            .toLocaleLowerCase("tr-TR");
+          const raf =
+            (urun.raf || "")
+              .toLocaleLowerCase("tr-TR");
 
-        const raf =
-          (urun.raf || "")
-            .toLocaleLowerCase("tr-TR");
-
-        return (
-          kod.includes(kelime) ||
-          isim.includes(kelime) ||
-          raf.includes(kelime)
-        );
-      });
-
-    setSonuclar(bulunanlar);
-  }
+          return (
+            kod.includes(kelime) ||
+            isim.includes(kelime) ||
+            raf.includes(kelime)
+          );
+        })
+      : [];
 
   return (
     <main style={styles.ana}>
 
-      <div style={styles.aramaKutu}>
+      <div
+        className="arama-kapsayici"
+        style={styles.aramaKutu}
+      >
 
-        <h1 style={styles.baslik}>
-          Ürününü Bul
-        </h1>
+        <div style={styles.logoMerkez}>
+
+          <img
+            className="ana-logo"
+            src={logo}
+            alt="Etiket Dolabı"
+            style={styles.logoBuyuk}
+          />
+
+        </div>
+
+        <div
+          className="ana-baslik"
+          style={styles.logoBuyukYazi}
+        >
+          ETİKET DOLABI
+        </div>
 
         <p style={styles.altBaslik}>
           Ürün kodu, ürün adı veya raf ara
         </p>
 
+        <div style={styles.toplamKutu}>
+
+          <span>
+            Toplam Ürün
+          </span>
+
+          <strong>
+            {urunler.length}
+          </strong>
+
+        </div>
+
         <div style={styles.aramaAlani}>
 
           <input
             type="text"
-            placeholder="Örn: TEST001"
+            placeholder="Ürün kodu, ürün adı veya raf..."
             value={arama}
             onChange={(e) =>
               setArama(e.target.value)
             }
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                ara();
-              }
-            }}
-            style={styles.input}
+            style={styles.aramaInput}
+            autoFocus
           />
 
-          <button
-            onClick={ara}
-            style={styles.araButon}
-          >
-            ARA
-          </button>
+          {arama && (
+            <button
+              onClick={() => setArama("")}
+              style={styles.temizleButon}
+            >
+              ×
+            </button>
+          )}
 
         </div>
 
         {yukleniyor && (
           <p style={styles.bilgi}>
-            Veriler yükleniyor...
+            Ürünler yükleniyor...
           </p>
         )}
 
@@ -274,9 +411,26 @@ function AramaSayfasi() {
           !hata &&
           arama.trim() &&
           sonuclar.length === 0 && (
-            <p style={styles.bilgi}>
-              Ürün bulunamadı.
-            </p>
+
+            <div style={styles.bulunamadi}>
+
+              <strong>
+                Ürün bulunamadı
+              </strong>
+
+              <span>
+                "{arama}" için eşleşen kayıt yok.
+              </span>
+
+            </div>
+          )}
+
+        {arama.trim() &&
+          sonuclar.length > 0 && (
+
+            <div style={styles.sonucSayisi}>
+              {sonuclar.length} kayıt bulundu
+            </div>
           )}
 
         <div style={styles.sonuclar}>
@@ -296,19 +450,15 @@ function AramaSayfasi() {
                 {urun.urun_ismi}
               </div>
 
-              <div style={styles.bilgiler}>
+              <div style={styles.rafKutu}>
 
-                <div style={styles.bilgiKutusu}>
+                <span style={styles.rafBaslik}>
+                  RAF
+                </span>
 
-                  <span style={styles.etiket}>
-                    RAF
-                  </span>
-
-                  <strong>
-                    {urun.raf || "-"}
-                  </strong>
-
-                </div>
+                <strong style={styles.rafDeger}>
+                  {urun.raf || "-"}
+                </strong>
 
               </div>
 
@@ -318,6 +468,26 @@ function AramaSayfasi() {
 
         </div>
 
+        {!arama.trim() && !yukleniyor && (
+
+          <div style={styles.baslangicMesaji}>
+
+            <div style={styles.aramaIkon}>
+              ⌕
+            </div>
+
+            <strong>
+              Aramak için yazmaya başlayın
+            </strong>
+
+            <span>
+              Ürün kodu, ürün adı veya raf üzerinden arama yapabilirsiniz.
+            </span>
+
+          </div>
+
+        )}
+
       </div>
 
     </main>
@@ -325,9 +495,9 @@ function AramaSayfasi() {
 }
 
 
-/* =====================================
-   ADMIN GİRİŞ
-===================================== */
+/* =====================================================
+   GİRİŞ
+===================================================== */
 
 function GirisSayfasi({ setSayfa }) {
 
@@ -372,7 +542,9 @@ function GirisSayfasi({ setSayfa }) {
         style={styles.girisKutu}
       >
 
-        <h2>Admin Girişi</h2>
+        <h2 style={styles.formBaslik}>
+          Admin Girişi
+        </h2>
 
         <input
           type="email"
@@ -417,9 +589,9 @@ function GirisSayfasi({ setSayfa }) {
 }
 
 
-/* =====================================
+/* =====================================================
    ADMIN PANELİ
-===================================== */
+===================================================== */
 
 function AdminPanel() {
 
@@ -455,35 +627,13 @@ function AdminPanel() {
     urunleriGetir();
   }, []);
 
-  useEffect(() => {
-
-    const kanal = supabase
-      .channel("admin-urunler-canli")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "urunler",
-        },
-        () => {
-          urunleriGetir();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(kanal);
-    };
-
-  }, []);
-
   async function urunleriGetir() {
 
-    const { data, error } = await supabase
-      .from("urunler")
-      .select("*")
-      .order("urun_kodu");
+    const { data, error } =
+      await supabase
+        .from("urunler")
+        .select("*")
+        .order("urun_kodu");
 
     if (error) {
       setHata(error.message);
@@ -492,9 +642,6 @@ function AdminPanel() {
 
     setUrunler(data || []);
   }
-
-
-  /* MANUEL ÜRÜN */
 
   function formDegistir(e) {
 
@@ -523,8 +670,8 @@ function AdminPanel() {
     setHata("");
 
     if (
-      !form.urun_kodu ||
-      !form.urun_ismi
+      !form.urun_kodu.trim() ||
+      !form.urun_ismi.trim()
     ) {
 
       setHata(
@@ -540,9 +687,15 @@ function AdminPanel() {
         await supabase
           .from("urunler")
           .update({
-            urun_kodu: form.urun_kodu,
-            urun_ismi: form.urun_ismi,
-            raf: form.raf,
+            urun_kodu:
+              form.urun_kodu.trim(),
+
+            urun_ismi:
+              form.urun_ismi.trim(),
+
+            raf:
+              form.raf.trim(),
+
             updated_at:
               new Date().toISOString(),
           })
@@ -553,7 +706,9 @@ function AdminPanel() {
         return;
       }
 
-      setMesaj("Ürün güncellendi.");
+      setMesaj(
+        "Ürün güncellendi."
+      );
 
     } else {
 
@@ -561,9 +716,14 @@ function AdminPanel() {
         await supabase
           .from("urunler")
           .insert({
-            urun_kodu: form.urun_kodu,
-            urun_ismi: form.urun_ismi,
-            raf: form.raf,
+            urun_kodu:
+              form.urun_kodu.trim(),
+
+            urun_ismi:
+              form.urun_ismi.trim(),
+
+            raf:
+              form.raf.trim(),
           });
 
       if (error) {
@@ -571,7 +731,9 @@ function AdminPanel() {
         return;
       }
 
-      setMesaj("Ürün eklendi.");
+      setMesaj(
+        "Ürün eklendi."
+      );
     }
 
     temizle();
@@ -579,15 +741,17 @@ function AdminPanel() {
     await urunleriGetir();
   }
 
-
   function duzenle(urun) {
 
     setForm({
       id: urun.id,
+
       urun_kodu:
         urun.urun_kodu || "",
+
       urun_ismi:
         urun.urun_ismi || "",
+
       raf:
         urun.raf || "",
     });
@@ -598,12 +762,12 @@ function AdminPanel() {
     });
   }
 
-
   async function sil(urun) {
 
-    const onay = window.confirm(
-      `"${urun.urun_kodu}" ürününü silmek istediğine emin misin?`
-    );
+    const onay =
+      window.confirm(
+        `"${urun.urun_kodu}" ürününü silmek istediğine emin misin?`
+      );
 
     if (!onay) {
       return;
@@ -620,19 +784,17 @@ function AdminPanel() {
       return;
     }
 
-    setMesaj("Ürün silindi.");
+    setMesaj(
+      "Ürün silindi."
+    );
 
     await urunleriGetir();
   }
 
-
-  /* =================================
-     EXCEL OKUMA
-  ================================= */
-
   function excelSec(e) {
 
-    const dosya = e.target.files[0];
+    const dosya =
+      e.target.files[0];
 
     if (!dosya) {
       return;
@@ -674,65 +836,62 @@ function AdminPanel() {
           );
 
         const urunler =
-          satirlar
-            .map((satir) => {
+          satirlar.map((satir) => {
 
-              const urunKodu =
-                satir["Ürün Kodu"] ??
-                satir["urun_kodu"] ??
-                satir["Ürün kodu"] ??
-                "";
+            const urunKodu =
+              satir["Ürün Kodu"] ??
+              satir["urun_kodu"] ??
+              satir["Ürün kodu"] ??
+              "";
 
-              const urunIsmi =
-                satir["Ürün İsmi"] ??
-                satir["urun_ismi"] ??
-                satir["Ürün ismi"] ??
-                satir["Ürün Adı"] ??
-                satir["Ürün adı"] ??
-                "";
+            const urunIsmi =
+              satir["Ürün İsmi"] ??
+              satir["urun_ismi"] ??
+              satir["Ürün ismi"] ??
+              satir["Ürün Adı"] ??
+              satir["Ürün adı"] ??
+              "";
 
-              const raf =
-                satir["Raf"] ??
-                satir["raf"] ??
-                "";
+            const raf =
+              satir["Raf"] ??
+              satir["raf"] ??
+              "";
 
-              return {
-                urun_kodu:
-                  String(
-                    urunKodu
-                  ).trim(),
+            return {
+              urun_kodu:
+                String(
+                  urunKodu
+                ).trim(),
 
-                urun_ismi:
-                  String(
-                    urunIsmi
-                  ).trim(),
+              urun_ismi:
+                String(
+                  urunIsmi
+                ).trim(),
 
-                raf:
-                  String(
-                    raf
-                  ).trim(),
-              };
-            })
-            .filter(
-              (urun) =>
-                urun.urun_kodu &&
-                urun.urun_ismi
-            );
+              raf:
+                String(
+                  raf
+                ).trim(),
+            };
+          });
 
-        if (urunler.length === 0) {
-
-          setExcelHata(
-            "Excel'de uygun ürün bulunamadı. Sütun isimleri Ürün Kodu, Ürün İsmi ve Raf olmalı."
+        const gecerli =
+          urunler.filter(
+            (urun) =>
+              urun.urun_kodu &&
+              urun.urun_ismi
           );
 
-          return;
-        }
-
-        setExcelUrunleri(urunler);
-
-        setExcelMesaj(
-          `${urunler.length} ürün bulundu. Aktarmaya hazır.`
+        setExcelUrunleri(
+          gecerli
         );
+
+        if (gecerli.length > 0) {
+
+          setExcelMesaj(
+            `${gecerli.length} kayıt hazır.`
+          );
+        }
 
       } catch (error) {
 
@@ -744,20 +903,19 @@ function AdminPanel() {
       }
     };
 
-    reader.readAsArrayBuffer(dosya);
+    reader.readAsArrayBuffer(
+      dosya
+    );
   }
-
-
-  /* =================================
-     EXCEL AKTAR
-  ================================= */
 
   async function excelAktar() {
 
-    if (excelUrunleri.length === 0) {
+    if (
+      excelUrunleri.length === 0
+    ) {
 
       setExcelHata(
-        "Önce bir Excel dosyası seç."
+        "Aktarılacak ürün bulunamadı."
       );
 
       return;
@@ -772,12 +930,8 @@ function AdminPanel() {
       const { error } =
         await supabase
           .from("urunler")
-          .upsert(
-            excelUrunleri,
-            {
-              onConflict:
-                "urun_kodu",
-            }
+          .insert(
+            excelUrunleri
           );
 
       if (error) {
@@ -817,6 +971,38 @@ function AdminPanel() {
     }
   }
 
+  function sablonIndir() {
+
+    const veri = [
+      {
+        "Ürün Kodu": "ABC001",
+        "Ürün İsmi": "Örnek Ürün",
+        "Raf": "A-01-01",
+      },
+      {
+        "Ürün Kodu": "ABC002",
+        "Ürün İsmi": "Başka Ürün",
+        "Raf": "B-02-05",
+      },
+    ];
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(veri);
+
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Ürünler"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      "ETIKET_DOLABI_SABLON.xlsx"
+    );
+  }
 
   const filtreliUrunler =
     urunler.filter((urun) => {
@@ -847,13 +1033,38 @@ function AdminPanel() {
       );
     });
 
-
   return (
     <main style={styles.adminAna}>
 
       <div style={styles.adminKutu}>
 
-        <h1>Admin Paneli</h1>
+        <div style={styles.adminBaslik}>
+
+          <div>
+
+            <h1 style={styles.adminLogo}>
+              ETİKET DOLABI
+            </h1>
+
+            <p style={styles.adminAlt}>
+              Admin Paneli
+            </p>
+
+          </div>
+
+          <div style={styles.adminToplam}>
+
+            <span>
+              Toplam kayıt
+            </span>
+
+            <strong>
+              {urunler.length}
+            </strong>
+
+          </div>
+
+        </div>
 
         <div style={styles.form}>
 
@@ -923,19 +1134,30 @@ function AdminPanel() {
 
         </div>
 
-
         <div style={styles.excelKutu}>
 
-          <h2>
-            Excel'den Toplu Ürün Aktar
-          </h2>
+          <div style={styles.excelBaslik}>
 
-          <p style={styles.excelAciklama}>
-            Excel sütunları:
-            <strong>
-              {" "}Ürün Kodu | Ürün İsmi | Raf
-            </strong>
-          </p>
+            <div>
+
+              <h2>
+                Excel'den Toplu Aktar
+              </h2>
+
+              <p style={styles.excelAciklama}>
+                Ürün Kodu | Ürün İsmi | Raf
+              </p>
+
+            </div>
+
+            <button
+              onClick={sablonIndir}
+              style={styles.sablonButon}
+            >
+              Excel Şablonu İndir
+            </button>
+
+          </div>
 
           <input
             id="excelInput"
@@ -946,12 +1168,13 @@ function AdminPanel() {
           />
 
           {excelDosya && (
-            <p style={styles.dosyaAdi}>
-              Seçilen dosya:
+            <div style={styles.dosyaAdi}>
+              Seçilen:
               <strong>
-                {" "}{excelDosya.name}
+                {" "}
+                {excelDosya.name}
               </strong>
-            </p>
+            </div>
           )}
 
           {excelMesaj && (
@@ -974,19 +1197,10 @@ function AdminPanel() {
                 Önizleme
               </h3>
 
-              <p>
-                Toplam{" "}
-                <strong>
-                  {excelUrunleri.length}
-                </strong>{" "}
-                ürün bulundu.
-              </p>
-
-              <div style={styles.onizlemeListe}>
-
-                {excelUrunleri
-                  .slice(0, 10)
-                  .map((urun, index) => (
+              {excelUrunleri
+                .slice(0, 15)
+                .map(
+                  (urun, index) => (
 
                     <div
                       key={index}
@@ -1002,20 +1216,12 @@ function AdminPanel() {
                       </span>
 
                       <span>
-                        Raf: {urun.raf || "-"}
+                        {urun.raf || "-"}
                       </span>
 
                     </div>
-
-                  ))}
-
-              </div>
-
-              {excelUrunleri.length > 10 && (
-                <p style={styles.kucukYazi}>
-                  İlk 10 ürün gösteriliyor.
-                </p>
-              )}
+                  )
+                )}
 
               <button
                 onClick={excelAktar}
@@ -1024,21 +1230,27 @@ function AdminPanel() {
               >
                 {excelYukleniyor
                   ? "AKTARILIYOR..."
-                  : "EXCEL'İ VERİTABANINA AKTAR"}
+                  : "EXCEL'İ AKTAR"}
               </button>
 
             </div>
-
           )}
 
         </div>
 
-
         <div style={styles.listeBaslik}>
 
-          <h2>
-            Ürünler ({filtreliUrunler.length})
-          </h2>
+          <div>
+
+            <h2>
+              Ürünler
+            </h2>
+
+            <span style={styles.kayitSayisi}>
+              {filtreliUrunler.length} kayıt
+            </span>
+
+          </div>
 
           <input
             placeholder="Ürünlerde ara..."
@@ -1051,10 +1263,8 @@ function AdminPanel() {
 
         </div>
 
-
-        <div>
-
-          {filtreliUrunler.map((urun) => (
+        {filtreliUrunler.map(
+          (urun) => (
 
             <div
               key={urun.id}
@@ -1063,23 +1273,21 @@ function AdminPanel() {
 
               <div style={{ flex: 1 }}>
 
-                <strong>
+                <div style={styles.adminKod}>
                   {urun.urun_kodu}
-                </strong>
+                </div>
 
-                <div>
+                <div style={styles.adminIsim}>
                   {urun.urun_ismi}
                 </div>
 
-                <small>
-                  Raf: {urun.raf || "-"}
-                </small>
-
               </div>
 
-              <div
-                style={styles.islemButonlari}
-              >
+              <div style={styles.adminRaf}>
+                {urun.raf || "-"}
+              </div>
+
+              <div style={styles.islemButonlari}>
 
                 <button
                   onClick={() =>
@@ -1102,10 +1310,8 @@ function AdminPanel() {
               </div>
 
             </div>
-
-          ))}
-
-        </div>
+          )
+        )}
 
       </div>
 
@@ -1114,195 +1320,662 @@ function AdminPanel() {
 }
 
 
-/* =====================================
-   STİLLER
-===================================== */
+/* =====================================================
+   TASARIM
+===================================================== */
 
 const styles = {
 
   sayfa: {
+    width: "100%",
     minHeight: "100vh",
-    background: "#f4f6f8",
-    fontFamily: "Arial, sans-serif",
+
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+
+    color: "#f5f5f7",
+
+    background:
+      "radial-gradient(circle at 10% 8%, rgba(44,67,115,.30), transparent 30%), radial-gradient(circle at 90% 15%, rgba(88,52,130,.25), transparent 34%), linear-gradient(135deg,#070910 0%,#10131c 48%,#080910 100%)",
   },
 
   header: {
-    background: "#111",
-    color: "white",
+    width: "100%",
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+
+    background:
+      "rgba(12,15,23,.68)",
+
+    backdropFilter:
+      "blur(28px) saturate(170%)",
+
+    WebkitBackdropFilter:
+      "blur(28px) saturate(170%)",
+
+    borderBottom:
+      "1px solid rgba(255,255,255,.10)",
+
+    boxShadow:
+      "0 10px 35px rgba(0,0,0,.28)",
   },
 
   headerIc: {
-    maxWidth: "1100px",
-    margin: "auto",
-    padding: "15px 20px",
+    width: "100%",
+    maxWidth: "1400px",
+
+    margin: "0 auto",
+
+    minHeight: "56px",
+
+    padding:
+      "7px 20px",
+
     display: "flex",
-    justifyContent: "space-between",
+
+    justifyContent:
+      "flex-end",
+
     alignItems: "center",
   },
 
-  logo: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    letterSpacing: "2px",
-    cursor: "pointer",
+  headerBosluk: {
+    flex: 1,
   },
 
   menu: {
     display: "flex",
-    gap: "8px",
+    alignItems: "center",
+    gap: "7px",
   },
 
   menuButon: {
-    border: "none",
-    background: "transparent",
-    color: "white",
-    padding: "9px 12px",
+    border:
+      "1px solid rgba(255,255,255,.13)",
+
+    background:
+      "rgba(255,255,255,.075)",
+
+    color: "#f5f5f7",
+
+    padding:
+      "9px 14px",
+
     cursor: "pointer",
+
+    borderRadius: "12px",
+
+    backdropFilter:
+      "blur(16px)",
+
+    WebkitBackdropFilter:
+      "blur(16px)",
+
+    fontWeight: "600",
   },
 
   cikisButon: {
-    border: "none",
-    background: "#c62828",
-    color: "white",
-    padding: "9px 14px",
-    borderRadius: "7px",
+    border:
+      "1px solid rgba(255,80,80,.32)",
+
+    background:
+      "linear-gradient(135deg,rgba(220,38,38,.86),rgba(170,20,35,.86))",
+
+    color: "#fff",
+
+    padding:
+      "9px 15px",
+
+    borderRadius: "12px",
+
     cursor: "pointer",
+
+    fontWeight: "700",
+
+    boxShadow:
+      "0 5px 20px rgba(220,38,38,.20)",
   },
 
   ana: {
-    minHeight: "calc(100vh - 60px)",
+    width: "100%",
+    minHeight:
+      "calc(100vh - 56px)",
+
     display: "flex",
+
     justifyContent: "center",
-    padding: "60px 20px",
-    background: "#f4f6f8",
+
+    alignItems: "flex-start",
+
+    padding:
+      "34px 20px 80px",
+
+    margin: 0,
   },
 
   aramaKutu: {
     width: "100%",
-    maxWidth: "750px",
+    maxWidth: "800px",
+
+    marginLeft: "auto",
+    marginRight: "auto",
+
+    position: "relative",
+    left: "0",
+    right: "0",
   },
 
-  baslik: {
+  logoMerkez: {
+    width: "100%",
+
+    display: "flex",
+
+    justifyContent:
+      "center",
+
+    alignItems: "center",
+
+    marginTop: "0",
+
+    marginBottom: "0",
+
     textAlign: "center",
-    fontSize: "40px",
-    marginBottom: "8px",
+  },
+
+  logoBuyuk: {
+    width: "175px",
+
+    height: "175px",
+
+    objectFit: "contain",
+
+    display: "block",
+
+    margin:
+      "0 auto",
+
+    filter:
+      "drop-shadow(0 0 18px rgba(100,145,255,.34))",
+  },
+
+  logoBuyukYazi: {
+    width: "100%",
+
+    display: "block",
+
+    textAlign: "center",
+
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    fontSize:
+      "clamp(42px, 7vw, 66px)",
+
+    fontWeight: "900",
+
+    letterSpacing: "2px",
+
+    lineHeight: "0.98",
+
+    color: "#fff",
+
+    marginTop: "5px",
+
+    marginBottom: "0",
+
+    textShadow:
+      "0 0 25px rgba(255,255,255,.10)",
   },
 
   altBaslik: {
+    width: "100%",
+
+    display: "block",
+
     textAlign: "center",
-    color: "#777",
-    marginBottom: "30px",
+
+    color: "#9299aa",
+
+    fontSize: "16px",
+
+    marginTop: "9px",
+
+    marginBottom: "27px",
+  },
+
+  toplamKutu: {
+    width: "100%",
+
+    display: "flex",
+
+    justifyContent:
+      "space-between",
+
+    alignItems: "center",
+
+    padding:
+      "17px 20px",
+
+    borderRadius: "20px",
+
+    background:
+      "linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.035))",
+
+    border:
+      "1px solid rgba(255,255,255,.12)",
+
+    backdropFilter:
+      "blur(30px) saturate(145%)",
+
+    WebkitBackdropFilter:
+      "blur(30px) saturate(145%)",
+
+    boxShadow:
+      "0 18px 50px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.08)",
+
+    color: "#aeb6c7",
+
+    marginBottom: "13px",
   },
 
   aramaAlani: {
-    display: "flex",
-    gap: "10px",
-  },
-
-  input: {
+    position: "relative",
     width: "100%",
-    boxSizing: "border-box",
-    padding: "14px",
-    fontSize: "16px",
-    border: "1px solid #ddd",
-    borderRadius: "9px",
-    outline: "none",
-    marginBottom: "10px",
   },
 
-  araButon: {
-    border: "none",
-    background: "#111",
-    color: "white",
-    padding: "14px 24px",
-    borderRadius: "9px",
-    fontWeight: "bold",
+  aramaInput: {
+    width: "100%",
+
+    padding:
+      "20px 58px 20px 22px",
+
+    fontSize: "18px",
+
+    fontWeight: "600",
+
+    color: "#fff",
+
+    WebkitTextFillColor: "#fff",
+
+    caretColor: "#fff",
+
+    background:
+      "linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.045))",
+
+    border:
+      "1px solid rgba(255,255,255,.16)",
+
+    borderRadius: "21px",
+
+    outline: "none",
+
+    backdropFilter:
+      "blur(32px) saturate(150%)",
+
+    WebkitBackdropFilter:
+      "blur(32px) saturate(150%)",
+
+    boxShadow:
+      "0 18px 55px rgba(0,0,0,.30), inset 0 1px rgba(255,255,255,.10)",
+
+    transition:
+      "border-color .2s ease, box-shadow .2s ease, background .2s ease",
+  },
+
+  temizleButon: {
+    position: "absolute",
+
+    right: "12px",
+
+    top: "50%",
+
+    transform:
+      "translateY(-50%)",
+
+    width: "35px",
+
+    height: "35px",
+
+    border:
+      "1px solid rgba(255,255,255,.17)",
+
+    borderRadius: "50%",
+
+    background:
+      "rgba(255,255,255,.10)",
+
+    color: "#e8eaf0",
+
+    fontSize: "22px",
+
     cursor: "pointer",
   },
 
   bilgi: {
     textAlign: "center",
-    color: "#777",
-    marginTop: "30px",
+    color: "#9ca3af",
   },
 
   hata: {
-    color: "#c62828",
-    marginTop: "15px",
+    color: "#ff7070",
   },
 
   basari: {
-    color: "#16803c",
-    marginTop: "15px",
+    color: "#55df91",
+  },
+
+  sonucSayisi: {
+    textAlign: "center",
+
+    color: "#b5bdce",
+
+    fontWeight: "700",
+
+    margin:
+      "24px 0 16px",
+  },
+
+  bulunamadi: {
+    marginTop: "25px",
+
+    padding: "28px",
+
+    textAlign: "center",
+
+    display: "flex",
+
+    flexDirection: "column",
+
+    gap: "8px",
+
+    borderRadius: "20px",
+
+    background:
+      "rgba(255,255,255,.055)",
+
+    border:
+      "1px solid rgba(255,255,255,.10)",
+
+    color: "#fff",
   },
 
   sonuclar: {
-    marginTop: "25px",
+    width: "100%",
   },
 
   sonuc: {
-    background: "white",
-    padding: "22px",
-    borderRadius: "12px",
-    marginBottom: "12px",
+    padding:
+      "21px 20px 18px",
+
+    marginBottom: "13px",
+
+    borderRadius: "23px",
+
+    textAlign: "left",
+
+    background:
+      "linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.035))",
+
+    border:
+      "1px solid rgba(255,255,255,.12)",
+
+    backdropFilter:
+      "blur(30px) saturate(145%)",
+
+    WebkitBackdropFilter:
+      "blur(30px) saturate(145%)",
+
     boxShadow:
-      "0 3px 15px rgba(0,0,0,0.05)",
+      "0 18px 50px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.07)",
+
+    transition:
+      "transform .2s ease, border-color .2s ease, box-shadow .2s ease",
   },
 
   urunKodu: {
-    color: "#777",
-    fontWeight: "bold",
-    fontSize: "14px",
+    color: "#ffffff",
+
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    fontSize: "30px",
+
+    fontWeight: "900",
+
+    letterSpacing: "0.5px",
+
+    lineHeight: "1.05",
+
+    marginBottom: "8px",
+
+    wordBreak: "break-word",
+
+    textShadow:
+      "0 0 18px rgba(255,255,255,.08)",
   },
 
   urunIsmi: {
-    fontSize: "21px",
-    fontWeight: "bold",
-    marginTop: "5px",
-    marginBottom: "20px",
+    color: "#ffffff",
+
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    fontSize: "24px",
+
+    fontWeight: "900",
+
+    letterSpacing: "0.2px",
+
+    lineHeight: "1.18",
+
+    marginBottom: "18px",
+
+    wordBreak: "break-word",
+
+    textShadow:
+      "0 0 18px rgba(255,255,255,.08)",
   },
 
-  bilgiler: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: "12px",
+  rafKutu: {
+    display: "flex",
+
+    alignItems: "center",
+
+    justifyContent:
+      "space-between",
+
+    padding:
+      "15px 17px",
+
+    marginTop: "4px",
+
+    borderRadius: "18px",
+
+    background:
+      "linear-gradient(135deg,rgba(105,125,175,.22),rgba(255,255,255,.055))",
+
+    border:
+      "1px solid rgba(175,195,245,.25)",
+
+    boxShadow:
+      "0 8px 28px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.10)",
   },
 
-  bilgiKutusu: {
-    background: "#f5f5f5",
-    padding: "14px",
-    borderRadius: "8px",
+  rafBaslik: {
+    color: "#c8d5f0",
+
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    fontSize: "13px",
+
+    fontWeight: "900",
+
+    letterSpacing: "1.5px",
   },
 
-  etiket: {
-    display: "block",
-    fontSize: "11px",
-    color: "#888",
-    marginBottom: "5px",
+  rafDeger: {
+    color: "#ffffff",
+
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    fontSize: "32px",
+
+    fontWeight: "900",
+
+    lineHeight: "1",
+
+    letterSpacing: "0.5px",
+
+    textShadow:
+      "0 0 20px rgba(170,195,255,.18)",
+  },
+
+  baslangicMesaji: {
+    marginTop: "23px",
+
+    padding:
+      "31px 20px 27px",
+
+    borderRadius: "22px",
+
+    textAlign: "center",
+
+    display: "flex",
+
+    flexDirection: "column",
+
+    gap: "8px",
+
+    color: "#9da5b7",
+
+    background:
+      "linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.025))",
+
+    border:
+      "1px solid rgba(255,255,255,.09)",
+
+    backdropFilter:
+      "blur(25px)",
+
+    WebkitBackdropFilter:
+      "blur(25px)",
+
+    boxShadow:
+      "0 15px 45px rgba(0,0,0,.20), inset 0 1px rgba(255,255,255,.06)",
+  },
+
+  aramaIkon: {
+    fontSize: "35px",
+    color: "#9ca3ff",
   },
 
   girisKutu: {
-    background: "white",
-    padding: "35px",
-    borderRadius: "15px",
     width: "100%",
-    maxWidth: "400px",
+
+    maxWidth: "410px",
+
+    padding: "32px",
+
     height: "fit-content",
+
+    borderRadius: "22px",
+
+    background:
+      "rgba(255,255,255,.065)",
+
+    border:
+      "1px solid rgba(255,255,255,.11)",
+
+    backdropFilter:
+      "blur(30px)",
+
+    WebkitBackdropFilter:
+      "blur(30px)",
+
     boxShadow:
-      "0 5px 25px rgba(0,0,0,0.08)",
+      "0 20px 60px rgba(0,0,0,.35)",
+  },
+
+  formBaslik: {
+    color: "#fff",
+    marginTop: "0",
+  },
+
+  input: {
+    width: "100%",
+
+    padding: "14px",
+
+    marginBottom: "11px",
+
+    color: "#fff",
+
+    WebkitTextFillColor: "#fff",
+
+    caretColor: "#fff",
+
+    background:
+      "rgba(255,255,255,.065)",
+
+    border:
+      "1px solid rgba(255,255,255,.13)",
+
+    borderRadius: "13px",
+
+    outline: "none",
+
+    fontSize: "16px",
+  },
+
+  araButon: {
+    border:
+      "1px solid rgba(255,255,255,.14)",
+
+    background:
+      "linear-gradient(135deg,rgba(91,110,170,.65),rgba(75,55,115,.65))",
+
+    color: "#fff",
+
+    padding:
+      "13px 22px",
+
+    borderRadius: "13px",
+
+    fontWeight: "800",
+
+    cursor: "pointer",
   },
 
   yukleniyor: {
-    padding: "50px",
-    textAlign: "center",
+    minHeight: "100vh",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    background: "#070910",
+
+    color: "#fff",
+
     fontFamily: "Arial",
   },
 
   adminAna: {
-    minHeight: "calc(100vh - 60px)",
-    background: "#f4f6f8",
-    padding: "35px 20px",
-    fontFamily: "Arial, sans-serif",
+    minHeight:
+      "calc(100vh - 56px)",
+
+    padding:
+      "30px 20px 70px",
+
+    background:
+      "linear-gradient(135deg,#080a10,#111520)",
+
+    color: "#fff",
   },
 
   adminKutu: {
@@ -1310,12 +1983,69 @@ const styles = {
     margin: "auto",
   },
 
+  adminBaslik: {
+    display: "flex",
+
+    justifyContent:
+      "space-between",
+
+    alignItems: "center",
+
+    gap: "20px",
+  },
+
+  adminLogo: {
+    fontFamily:
+      "'LT Wave Alt Black', sans-serif",
+
+    letterSpacing: "2px",
+  },
+
+  adminAlt: {
+    color: "#9299aa",
+  },
+
+  adminToplam: {
+    display: "flex",
+
+    flexDirection: "column",
+
+    alignItems: "center",
+
+    padding:
+      "15px 22px",
+
+    borderRadius: "16px",
+
+    background:
+      "rgba(255,255,255,.065)",
+
+    border:
+      "1px solid rgba(255,255,255,.10)",
+
+    color: "#9ca3af",
+  },
+
   form: {
-    background: "white",
     padding: "25px",
-    borderRadius: "12px",
+
     marginTop: "20px",
-    marginBottom: "30px",
+
+    marginBottom: "25px",
+
+    borderRadius: "21px",
+
+    background:
+      "rgba(255,255,255,.06)",
+
+    border:
+      "1px solid rgba(255,255,255,.10)",
+
+    backdropFilter:
+      "blur(25px)",
+
+    WebkitBackdropFilter:
+      "blur(25px)",
   },
 
   formButonlari: {
@@ -1324,95 +2054,223 @@ const styles = {
   },
 
   griButon: {
-    border: "none",
-    background: "#ddd",
-    padding: "14px 20px",
-    borderRadius: "9px",
+    border:
+      "1px solid rgba(255,255,255,.12)",
+
+    background:
+      "rgba(255,255,255,.07)",
+
+    color: "#fff",
+
+    padding:
+      "13px 20px",
+
+    borderRadius: "12px",
+
     cursor: "pointer",
   },
 
   excelKutu: {
-    background: "white",
     padding: "25px",
-    borderRadius: "12px",
-    marginBottom: "30px",
+
+    marginBottom: "25px",
+
+    borderRadius: "21px",
+
+    background:
+      "rgba(255,255,255,.06)",
+
+    border:
+      "1px solid rgba(255,255,255,.10)",
+
+    backdropFilter:
+      "blur(25px)",
+
+    WebkitBackdropFilter:
+      "blur(25px)",
+  },
+
+  excelBaslik: {
+    display: "flex",
+
+    justifyContent:
+      "space-between",
+
+    alignItems: "center",
+
+    gap: "20px",
   },
 
   excelAciklama: {
-    color: "#666",
-    marginBottom: "20px",
+    color: "#969eaf",
+  },
+
+  sablonButon: {
+    padding:
+      "11px 15px",
+
+    borderRadius: "11px",
+
+    border:
+      "1px solid rgba(255,255,255,.12)",
+
+    background:
+      "rgba(255,255,255,.07)",
+
+    color: "#fff",
+
+    cursor: "pointer",
   },
 
   dosyaInput: {
-    display: "block",
-    marginBottom: "15px",
+    margin:
+      "15px 0",
+
+    color: "#ddd",
   },
 
   dosyaAdi: {
-    color: "#555",
+    color: "#aaa",
   },
 
   excelOnizleme: {
     marginTop: "20px",
-    padding: "20px",
-    background: "#f7f7f7",
-    borderRadius: "10px",
-  },
 
-  onizlemeListe: {
-    marginTop: "15px",
+    padding: "20px",
+
+    borderRadius: "15px",
+
+    background:
+      "rgba(0,0,0,.20)",
   },
 
   onizlemeSatir: {
     display: "grid",
-    gridTemplateColumns:
-      "150px 1fr 150px",
-    gap: "10px",
-    padding: "10px",
-    background: "white",
-    borderBottom:
-      "1px solid #eee",
-  },
 
-  kucukYazi: {
-    fontSize: "13px",
-    color: "#777",
+    gridTemplateColumns:
+      "160px 1fr 150px",
+
+    gap: "10px",
+
+    padding: "10px",
+
+    borderBottom:
+      "1px solid rgba(255,255,255,.06)",
   },
 
   excelButon: {
     marginTop: "20px",
-    border: "none",
-    background: "#16803c",
-    color: "white",
-    padding: "14px 20px",
-    borderRadius: "9px",
-    fontWeight: "bold",
+
+    padding:
+      "13px 20px",
+
+    borderRadius: "12px",
+
+    border:
+      "1px solid rgba(100,220,150,.20)",
+
+    background:
+      "rgba(20,120,65,.75)",
+
+    color: "#fff",
+
+    fontWeight: "800",
+
     cursor: "pointer",
   },
 
   listeBaslik: {
     display: "flex",
-    justifyContent: "space-between",
+
+    justifyContent:
+      "space-between",
+
     alignItems: "center",
-    marginBottom: "15px",
+
     gap: "20px",
+
+    marginBottom: "15px",
+  },
+
+  kayitSayisi: {
+    color: "#9299aa",
   },
 
   inputKucuk: {
-    padding: "12px",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
     width: "250px",
+
+    padding: "12px",
+
+    color: "#fff",
+
+    WebkitTextFillColor: "#fff",
+
+    caretColor: "#fff",
+
+    background:
+      "rgba(255,255,255,.06)",
+
+    border:
+      "1px solid rgba(255,255,255,.12)",
+
+    borderRadius: "12px",
+
+    outline: "none",
   },
 
   adminUrun: {
-    background: "white",
-    padding: "18px",
-    borderRadius: "10px",
-    marginBottom: "8px",
     display: "flex",
+
     alignItems: "center",
+
     gap: "15px",
+
+    padding: "16px",
+
+    marginBottom: "8px",
+
+    borderRadius: "15px",
+
+    background:
+      "rgba(255,255,255,.055)",
+
+    border:
+      "1px solid rgba(255,255,255,.09)",
+  },
+
+  adminKod: {
+    color: "#929aaa",
+
+    fontSize: "13px",
+
+    fontWeight: "700",
+  },
+
+  adminIsim: {
+    color: "#fff",
+
+    fontSize: "17px",
+
+    fontWeight: "700",
+
+    marginTop: "3px",
+  },
+
+  adminRaf: {
+    padding:
+      "10px 14px",
+
+    borderRadius: "10px",
+
+    color: "#fff",
+
+    fontWeight: "800",
+
+    background:
+      "rgba(255,255,255,.08)",
+
+    border:
+      "1px solid rgba(255,255,255,.11)",
   },
 
   islemButonlari: {
@@ -1421,19 +2279,36 @@ const styles = {
   },
 
   duzenleButon: {
-    border: "none",
-    background: "#eee",
-    padding: "9px 12px",
-    borderRadius: "7px",
+    padding:
+      "9px 12px",
+
+    borderRadius: "10px",
+
+    border:
+      "1px solid rgba(255,255,255,.10)",
+
+    background:
+      "rgba(255,255,255,.07)",
+
+    color: "#fff",
+
     cursor: "pointer",
   },
 
   silButon: {
-    border: "none",
-    background: "#c62828",
-    color: "white",
-    padding: "9px 12px",
-    borderRadius: "7px",
+    padding:
+      "9px 12px",
+
+    borderRadius: "10px",
+
+    border:
+      "1px solid rgba(255,70,70,.25)",
+
+    background:
+      "rgba(190,30,40,.75)",
+
+    color: "#fff",
+
     cursor: "pointer",
   },
 };
